@@ -1,0 +1,73 @@
+<div class="login-container">
+  <div class="glass-card login-card animate-fade-in">
+    <div class="login-header">
+      <div class="logo-placeholder">
+        <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="logo-icon">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+      </div>
+      <h2>¡Hola de nuevo!</h2>
+      <p class="subtitle">Inicia sesión para continuar en tu blog en tiempo real</p>
+    </div>
+
+    <div *ngIf="successMessage" class="alert-success">
+      <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      <span>{{ successMessage }}</span>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert-error">
+
+      <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="username" class="form-label">Nombre de Usuario</label>
+        <input 
+          id="username"
+          type="text" 
+          formControlName="username" 
+          class="glass-input" 
+          placeholder="ej. joseph"
+          [class.input-error]="isTouchedAndInvalid('username')"
+        />
+        <span *ngIf="isTouchedAndInvalid('username')" class="error-msg">
+          El nombre de usuario es obligatorio.
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Contraseña</label>
+        <input 
+          id="password"
+          type="password" 
+          formControlName="password" 
+          class="glass-input" 
+          placeholder="••••••••"
+          [class.input-error]="isTouchedAndInvalid('password')"
+        />
+        <span *ngIf="isTouchedAndInvalid('password')" class="error-msg">
+          La contraseña es obligatoria.
+        </span>
+      </div>
+
+      <button type="submit" [disabled]="loginForm.invalid || loading" class="btn-primary login-btn">
+        <span *ngIf="!loading">Ingresar</span>
+        <span *ngIf="loading" class="spinner"></span>
+        <span *ngIf="loading">Procesando...</span>
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p>¿No tienes una cuenta? <a routerLink="/register">Regístrate aquí</a></p>
+    </div>
+  </div>
+</div>

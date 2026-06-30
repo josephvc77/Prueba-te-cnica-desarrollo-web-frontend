@@ -1,0 +1,19 @@
+# Snyk (https://snyk.io) policy file, generated 2026-06-30.
+version: v1.25.0
+ignore:
+  SNYK-JS-ANGULARCOMMON-17356555:
+    - '*':
+        reason: La aplicación es una SPA puramente del lado del cliente y no implementa Server-Side Rendering (SSR). Por lo tanto, la vulnerabilidad HttpTransferCache no es explotable.
+        expires: '2027-06-30T00:00:00.000Z'
+  SNYK-JS-ANGULARCOMMON-17356486:
+    - '*':
+        reason: La aplicación no utiliza funciones complejas de formateo de fechas con entradas dinámicas que puedan activar el fallo de ReDoS.
+        expires: '2027-06-30T00:00:00.000Z'
+  SNYK-JS-ANGULARCOMPILER-17356585:
+    - '*':
+        reason: El compilador se ejecuta exclusivamente en build time (CLI) y nunca se incluye para compilar plantillas dinámicas en tiempo de ejecución en el navegador.
+        expires: '2027-06-30T00:00:00.000Z'
+  SNYK-JS-ANGULARCORE-17353317:
+    - '*':
+        reason: Esta vulnerabilidad se asocia con mecanismos de hidratación de cliente en Server-Side Rendering, ausentes en esta SPA.
+        expires: '2027-06-30T00:00:00.000Z'
