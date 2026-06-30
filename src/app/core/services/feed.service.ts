@@ -11,6 +11,7 @@ export class FeedService implements OnDestroy {
   private apiUrl = 'http://localhost:3000';
   private socket!: Socket;
   private newCommentSubject = new Subject<any>();
+  private likeUpdateSubject = new Subject<any>();
 
   constructor(private http: HttpClient, private authService: AuthService) {
     this.connectSocket();
@@ -29,6 +30,11 @@ export class FeedService implements OnDestroy {
       this.newCommentSubject.next(comment);
     });
 
+    // Listen for real-time like updates
+    this.socket.on('like_update', (comment: any) => {
+      this.likeUpdateSubject.next(comment);
+    });
+
     this.socket.on('disconnect', () => {
       console.log('Desconectado del socket de tiempo real.');
     });
@@ -37,6 +43,11 @@ export class FeedService implements OnDestroy {
   // Expose real-time comments stream as Observable
   getNewComments(): Observable<any> {
     return this.newCommentSubject.asObservable();
+  }
+
+  // Expose real-time like updates stream as Observable
+  getLikeUpdates(): Observable<any> {
+    return this.likeUpdateSubject.asObservable();
   }
 
   // HTTP GET: Fetch list of comments
@@ -49,6 +60,12 @@ export class FeedService implements OnDestroy {
   postComment(content: string): Observable<any> {
     const headers = this.authService.getAuthHeaders();
     return this.http.post<any>(`${this.apiUrl}/feed`, { content }, { headers });
+  }
+
+  // HTTP POST: Like/Unlike a comment
+  likeComment(commentId: string): Observable<any> {
+    const headers = this.authService.getAuthHeaders();
+    return this.http.post<any>(`${this.apiUrl}/feed/${commentId}/like`, {}, { headers });
   }
 
   disconnectSocket(): void {

@@ -32,6 +32,7 @@ export class FeedComponent implements OnInit, OnDestroy {
   passwordSuccess = '';
 
   private socketSubscription!: Subscription;
+  private likeSubscription!: Subscription;
   private apiUrl = 'http://localhost:3000';
 
   constructor(
@@ -99,6 +100,19 @@ export class FeedComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error en WebSocket stream:', err);
+      }
+    });
+
+    // 4. Listen to real-time likes/reactions via Socket.io
+    this.likeSubscription = this.feedService.getLikeUpdates().subscribe({
+      next: (updatedComment) => {
+        const index = this.comments.findIndex(c => c.id === updatedComment.id);
+        if (index !== -1) {
+          this.comments[index] = updatedComment;
+        }
+      },
+      error: (err) => {
+        console.error('Error en WebSocket likes stream:', err);
       }
     });
   }
@@ -216,9 +230,37 @@ export class FeedComponent implements OnInit, OnDestroy {
     this.router.navigate(['/login']);
   }
 
+  // Like/Unlike action
+  onToggleLike(commentId: string): void {
+    this.feedService.likeComment(commentId).subscribe({
+      next: (res) => {
+        const index = this.comments.findIndex(c => c.id === commentId);
+        if (index !== -1 && res.comment) {
+          this.comments[index] = res.comment;
+        }
+      },
+      error: (err) => {
+        console.error('Error al cambiar reacción:', err);
+      }
+    });
+  }
+
+  isCommentLiked(comment: any): boolean {
+    if (!comment || !comment.likes || !this.currentUser) return false;
+    return comment.likes.includes(this.currentUser.id);
+  }
+
+  getLikesCount(comment: any): number {
+    if (!comment || !comment.likes) return 0;
+    return comment.likes.length;
+  }
+
   ngOnDestroy(): void {
     if (this.socketSubscription) {
       this.socketSubscription.unsubscribe();
+    }
+    if (this.likeSubscription) {
+      this.likeSubscription.unsubscribe();
     }
   }
 }
