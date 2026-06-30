@@ -1,5 +1,6 @@
 # Stage 1: Build
 FROM node:18-alpine AS builder
+RUN apk update && apk upgrade --no-cache
 WORKDIR /app
 COPY package*.json ./
 RUN npm install --legacy-peer-deps
@@ -8,6 +9,7 @@ RUN npm run build -- --configuration=production
 
 # Stage 2: Serve with Nginx
 FROM nginx:alpine
+RUN apk update && apk upgrade --no-cache
 COPY --from=builder /app/dist/frontend /usr/share/nginx/html
 # COPY custom nginx configuration if needed, or default
 EXPOSE 80
