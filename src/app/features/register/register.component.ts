@@ -28,7 +28,7 @@ export class RegisterComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       username: ['', [Validators.required, Validators.minLength(3)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      avatar: [null, [Validators.required]]
+      avatar: [null]
     });
   }
 
@@ -88,7 +88,7 @@ export class RegisterComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.registerForm.invalid || !this.selectedFile) {
+    if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
       return;
     }
@@ -101,7 +101,9 @@ export class RegisterComponent implements OnInit {
     formData.append('email', this.registerForm.get('email')?.value);
     formData.append('username', this.registerForm.get('username')?.value);
     formData.append('password', this.registerForm.get('password')?.value);
-    formData.append('avatar', this.selectedFile, this.selectedFile.name);
+    if (this.selectedFile) {
+      formData.append('avatar', this.selectedFile, this.selectedFile.name);
+    }
 
     this.authService.register(formData).subscribe({
       next: (response) => {
