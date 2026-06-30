@@ -58,7 +58,7 @@ Una vez compilado, puedes abrir tu navegador en:
 El frontend está configurado para empaquetarse en un entorno de producción altamente optimizado mediante un **multi-stage build** en Docker que compila la SPA y la sirve a través de **Nginx**.
 
 ### A. Ejecución Individual del Contenedor de Frontend
-Si deseas construir y ejecutar únicamente la aplicación de frontend:
+Si deseas construir y ejecutar únicamente la aplicación de frontend de forma independiente:
 
 1. **Construir la imagen de Docker**:
    ```bash
@@ -70,12 +70,41 @@ Si deseas construir y ejecutar únicamente la aplicación de frontend:
    ```
    *(Esto compilará el código de producción y levantará Nginx sirviendo la SPA en el puerto 4200 de tu máquina).*
 
-### B. Orquestación Completa (Backend + Frontend)
-En el directorio raíz del proyecto se incluye un archivo `docker-compose.yml` para levantar la solución completa de forma integrada con un solo comando.
+### B. Orquestación Completa de la Solución (Backend + Frontend)
+Dado que ambos componentes se encuentran en repositorios separados, para orquestar la solución completa con Docker Compose debes:
 
-Desde la carpeta raíz del proyecto, ejecuta:
-```bash
-docker-compose up --build -d
-```
+1. Clonar ambos repositorios como carpetas hermanas dentro de un mismo directorio raíz:
+   ```text
+   mi-proyecto/
+   ├── backend/   (Clonado de: https://github.com/josephvc77/prueba-te-cnica-desarrollo-web-backend)
+   └── frontend/  (Clonado de: https://github.com/josephvc77/Prueba-te-cnica-desarrollo-web-frontend)
+   ```
+2. Crear un archivo llamado `docker-compose.yml` dentro del directorio raíz (`mi-proyecto/`) con el siguiente contenido:
+   ```yaml
+   version: '3.8'
 
-Este comando levantará la base de datos y la API de backend (puerto `3000`) junto con el cliente Angular servido por Nginx (puerto `4200` apuntando internamente al puerto `80`).
+   services:
+     backend:
+       build: ./backend
+       ports:
+         - "3000:3000"
+       volumes:
+         - backend-uploads:/app/uploads
+       environment:
+         - PORT=3000
+
+     frontend:
+       build: ./frontend
+       ports:
+         - "4200:80"
+       depends_on:
+         - backend
+
+   volumes:
+     backend-uploads:
+   ```
+3. Desde la carpeta raíz del proyecto (`mi-proyecto/`), ejecuta:
+   ```bash
+   docker-compose up --build -d
+   ```
+   Este comando levantará la API de backend (puerto `3000`) junto con el cliente Angular servido por Nginx (puerto `4200`) de forma totalmente integrada.
