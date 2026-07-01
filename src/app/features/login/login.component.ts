@@ -28,7 +28,7 @@ export class LoginComponent implements OnInit {
       password: ['', [Validators.required]]
     });
 
-    // Check if redirected from register
+    // Verificar si fue redirigido desde el registro
     this.route.queryParams.subscribe(params => {
       if (params['registered'] === 'success') {
         this.successMessage = '¡Registro exitoso! Por favor inicia sesión.';
@@ -51,7 +51,7 @@ export class LoginComponent implements OnInit {
     this.authService.login({ username, password }).subscribe({
       next: (response) => {
         this.loading = false;
-        // Redirect to feed on success
+        // Redirigir al feed en caso de éxito
         this.router.navigate(['/feed']);
       },
       error: (err) => {
@@ -70,7 +70,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // Helpers for template access
+  // Ayudantes para acceso a la plantilla
   isTouchedAndInvalid(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
     return !!(field && field.touched && field.invalid);

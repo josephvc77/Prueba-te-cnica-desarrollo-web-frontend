@@ -11,7 +11,7 @@ export class GuestGuard implements CanActivate {
 
   canActivate(): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     if (this.authService.isAuthenticated()) {
-      // Redirect to feed if already logged in
+      // Redirigir al feed si ya está logueado
       this.router.navigate(['/feed']);
       return false;
     }

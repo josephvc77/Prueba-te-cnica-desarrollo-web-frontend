@@ -17,7 +17,7 @@ export class FeedService implements OnDestroy {
     this.connectSocket();
   }
 
-  // Establish connection to the Socket.io WebSocket server
+  // Establecer conexión con el servidor WebSocket de Socket.io
   private connectSocket(): void {
     this.socket = io(this.apiUrl);
 
@@ -25,12 +25,12 @@ export class FeedService implements OnDestroy {
       console.log('Conectado con éxito al socket de tiempo real.');
     });
 
-    // Listen for new comments broadcasted by the server
+    // Escuchar nuevos comentarios emitidos por el servidor
     this.socket.on('new_comment', (comment: any) => {
       this.newCommentSubject.next(comment);
     });
 
-    // Listen for real-time like updates
+    // Escuchar actualizaciones de "me gusta" en tiempo real
     this.socket.on('like_update', (comment: any) => {
       this.likeUpdateSubject.next(comment);
     });
@@ -40,29 +40,29 @@ export class FeedService implements OnDestroy {
     });
   }
 
-  // Expose real-time comments stream as Observable
+  // Exponer el flujo de comentarios en tiempo real como Observable
   getNewComments(): Observable<any> {
     return this.newCommentSubject.asObservable();
   }
 
-  // Expose real-time like updates stream as Observable
+  // Exponer el flujo de actualizaciones de "me gusta" en tiempo real como Observable
   getLikeUpdates(): Observable<any> {
     return this.likeUpdateSubject.asObservable();
   }
 
-  // HTTP GET: Fetch list of comments
+  // HTTP GET: Obtener la lista de comentarios
   getFeed(): Observable<any[]> {
     const headers = this.authService.getAuthHeaders();
     return this.http.get<any[]>(`${this.apiUrl}/feed`, { headers });
   }
 
-  // HTTP POST: Publish a comment
+  // HTTP POST: Publicar un comentario
   postComment(content: string): Observable<any> {
     const headers = this.authService.getAuthHeaders();
     return this.http.post<any>(`${this.apiUrl}/feed`, { content }, { headers });
   }
 
-  // HTTP POST: Like/Unlike a comment
+  // HTTP POST: Dar/Quitar "me gusta" a un comentario
   likeComment(commentId: string): Observable<any> {
     const headers = this.authService.getAuthHeaders();
     return this.http.post<any>(`${this.apiUrl}/feed/${commentId}/like`, {}, { headers });

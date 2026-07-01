@@ -10,13 +10,13 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  // 1. LOGIN
+  // 1. INICIAR SESIÓN
   login(credentials: { username: string; password?: string }): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
         if (response && response.access_token) {
           localStorage.setItem('access_token', response.access_token);
-          // Calculate and store expiration date
+          // Calcular y almacenar la fecha de expiración
           const expiresAt = Date.now() + response.expiration * 1000;
           localStorage.setItem('expires_at', expiresAt.toString());
         }
@@ -24,32 +24,31 @@ export class AuthService {
     );
   }
 
-  // 2. REGISTER (receives FormData because of Multer file upload)
+  // 2. REGISTRAR (recibe FormData debido a la subida de archivos de Multer)
   register(formData: FormData): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/register`, formData);
   }
 
-  // 3. GET PROFILE (/me)
+    // Nota: Si no se proporcionan cabeceras, el backend devolverá 400.
+    // Por defecto, enviaremos la cabecera de autorización aquí.
+  // 3. OBTENER PERFIL (/me)
   getMe(): Observable<any> {
-    // Note: If no headers are provided, backend will return 400.
-    // The HTTP interceptor will inject the header, but if we want to test missing headers,
-    // we can pass custom headers or check. By default, we will send the authorization header here.
     const headers = this.getAuthHeaders();
     return this.http.get<any>(`${this.apiUrl}/me`, { headers });
   }
 
-  // 4. CHANGE PASSWORD (/change-password)
+  // 4. CAMBIAR CONTRASEÑA (/change-password)
   changePassword(passwords: { oldPassword?: string; newPassword?: string }): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.post<any>(`${this.apiUrl}/change-password`, passwords, { headers });
   }
 
-  // Helper: Get JWT token from localStorage
+  // Ayudante: Obtener el token JWT de localStorage
   getToken(): string | null {
     return localStorage.getItem('access_token');
   }
 
-  // Check if token exists and is not expired
+  // Verificar si el token existe y no ha expirado
   isAuthenticated(): boolean {
     const token = this.getToken();
     if (!token) return false;
@@ -61,7 +60,7 @@ export class AuthService {
     return Date.now() < expiresAt;
   }
 
-  // Get HTTP headers with Bearer token
+  // Obtener cabeceras HTTP con el token Bearer
   getAuthHeaders(): HttpHeaders {
     const token = this.getToken();
     let headers = new HttpHeaders();
@@ -71,7 +70,7 @@ export class AuthService {
     return headers;
   }
 
-  // 5. LOGOUT
+  // 5. CERRAR SESIÓN
   logout(): void {
     localStorage.removeItem('access_token');
     localStorage.removeItem('expires_at');

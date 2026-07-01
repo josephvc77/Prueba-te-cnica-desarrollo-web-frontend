@@ -32,7 +32,6 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  // Custom validator to ensure name has no numbers
   noNumbersValidator(control: any) {
     if (control.value && /\d/.test(control.value)) {
       return { hasNumbers: true };
@@ -40,7 +39,6 @@ export class RegisterComponent implements OnInit {
     return null;
   }
 
-  // Handle file select from input or dropzone
   onFileSelected(event: any): void {
     const file = event.target.files?.[0];
     if (file) {
@@ -48,7 +46,6 @@ export class RegisterComponent implements OnInit {
     }
   }
 
-  // Handle drop event
   onFileDropped(event: DragEvent): void {
     event.preventDefault();
     const file = event.dataTransfer?.files?.[0];
@@ -62,13 +59,13 @@ export class RegisterComponent implements OnInit {
   }
 
   private handleFile(file: File): void {
-    // Validate file type is image
+    // Validar que el tipo de archivo sea una imagen
     if (!file.type.startsWith('image/')) {
       this.errorMessage = 'Por favor, selecciona únicamente archivos de imagen.';
       return;
     }
 
-    // Limit file size to 2MB
+    // Limitar el tamaño del archivo a 2MB
     if (file.size > 2 * 1024 * 1024) {
       this.errorMessage = 'La foto de perfil no debe superar los 2MB.';
       return;
@@ -79,7 +76,7 @@ export class RegisterComponent implements OnInit {
     this.registerForm.patchValue({ avatar: file });
     this.registerForm.get('avatar')?.updateValueAndValidity();
 
-    // Create a local URL preview of the file
+    // Crear una vista previa local de la URL del archivo
     const reader = new FileReader();
     reader.onload = () => {
       this.imagePreview = reader.result as string;
@@ -108,7 +105,7 @@ export class RegisterComponent implements OnInit {
     this.authService.register(formData).subscribe({
       next: (response) => {
         this.loading = false;
-        // Redirect to login page on success, with a flag to show success message
+        // Redirigir a la página de login en caso de éxito, con una bandera para mostrar el mensaje de éxito
         this.router.navigate(['/login'], { queryParams: { registered: 'success' } });
       },
       error: (err) => {
@@ -125,7 +122,7 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  // Helpers for template access
+  // Ayudantes para acceso a la plantilla
   isTouchedAndInvalid(fieldName: string): boolean {
     const field = this.registerForm.get(fieldName);
     return !!(field && field.touched && field.invalid);

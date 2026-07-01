@@ -17,7 +17,7 @@ export class FeedComponent implements OnInit, OnDestroy {
   commentForm!: FormGroup;
   passwordForm!: FormGroup;
   
-  // Status flags
+  // Banderas de estado
   loadingProfile = true;
   loadingFeed = true;
   submittingComment = false;
@@ -26,7 +26,7 @@ export class FeedComponent implements OnInit, OnDestroy {
   activeSettingsTab = 'profile'; // 'profile' | 'password' | 'theme'
   isDarkTheme = false;
 
-  // Feedback messages
+  // Mensajes de retroalimentación
   commentError = '';
   passwordError = '';
   passwordSuccess = '';
@@ -43,7 +43,7 @@ export class FeedComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Theme initialization
+    // Inicialización del tema
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
       this.isDarkTheme = true;
@@ -53,7 +53,7 @@ export class FeedComponent implements OnInit, OnDestroy {
       document.body.classList.remove('dark-theme');
     }
 
-    // Initialize Forms
+    // Inicializar formularios
     this.commentForm = this.fb.group({
       content: ['', [Validators.required, Validators.maxLength(500)]]
     });
@@ -63,7 +63,7 @@ export class FeedComponent implements OnInit, OnDestroy {
       newPassword: ['', [Validators.required, Validators.minLength(6)]]
     });
 
-    // 1. Fetch current user info (/me)
+    // 1. Obtener la información del usuario actual (/me)
     this.authService.getMe().subscribe({
       next: (user) => {
         this.currentUser = user;
@@ -72,12 +72,12 @@ export class FeedComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error('Error cargando datos del perfil:', err);
         this.loadingProfile = false;
-        // If auth fails, force logout
+        // Si falla la autenticación, forzar el cierre de sesión
         this.logout();
       }
     });
 
-    // 2. Fetch comments list (/feed GET)
+    // 2. Obtener la lista de comentarios (/feed GET)
     this.feedService.getFeed().subscribe({
       next: (feedData) => {
         this.comments = feedData;
@@ -89,12 +89,12 @@ export class FeedComponent implements OnInit, OnDestroy {
       }
     });
 
-    // 3. Listen to real-time comment updates via Socket.io
+    // 3. Escuchar actualizaciones de comentarios en tiempo real mediante Socket.io
     this.socketSubscription = this.feedService.getNewComments().subscribe({
       next: (newComment) => {
-        // Prevent duplicate local additions
+        // Prevenir adiciones locales duplicadas
         if (!this.comments.some(c => c.id === newComment.id)) {
-          // Add to beginning of feed
+          // Agregar al principio del feed
           this.comments = [newComment, ...this.comments];
         }
       },
@@ -103,7 +103,7 @@ export class FeedComponent implements OnInit, OnDestroy {
       }
     });
 
-    // 4. Listen to real-time likes/reactions via Socket.io
+    // 4. Escuchar me gusta/reacciones en tiempo real mediante Socket.io
     this.likeSubscription = this.feedService.getLikeUpdates().subscribe({
       next: (updatedComment) => {
         const index = this.comments.findIndex(c => c.id === updatedComment.id);
@@ -117,7 +117,7 @@ export class FeedComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Submit comment to server (/feed POST)
+  // Enviar comentario al servidor (/feed POST)
   onSendComment(): void {
     if (this.commentForm.invalid) {
       return;
@@ -131,7 +131,7 @@ export class FeedComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.submittingComment = false;
         this.commentForm.reset();
-        // Socket listener will handle putting the comment into the list
+        // El oyente del socket se encargará de colocar el comentario en la lista
       },
       error: (err) => {
         this.submittingComment = false;
@@ -145,7 +145,7 @@ export class FeedComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Change password (/change-password POST)
+  // Cambiar contraseña (/change-password POST)
   onChangePassword(): void {
     if (this.passwordForm.invalid) {
       this.passwordForm.markAllAsTouched();
@@ -164,7 +164,7 @@ export class FeedComponent implements OnInit, OnDestroy {
         this.passwordSuccess = response.message || 'Contraseña actualizada correctamente.';
         this.passwordForm.reset();
         
-        // Close modal after delay
+        // Cerrar el modal después de un retraso
         setTimeout(() => {
           this.toggleSettingsModal(false);
         }, 2000);
@@ -185,7 +185,7 @@ export class FeedComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Toggles settings modal
+  // Alternar el modal de configuración
   toggleSettingsModal(show: boolean): void {
     this.showSettingsModal = show;
     this.activeSettingsTab = 'profile';
@@ -194,14 +194,14 @@ export class FeedComponent implements OnInit, OnDestroy {
     this.passwordForm.reset();
   }
 
-  // Switches settings modal active tab
+  // Cambiar la pestaña activa del modal de configuración
   setSettingsTab(tab: string): void {
     this.activeSettingsTab = tab;
     this.passwordError = '';
     this.passwordSuccess = '';
   }
 
-  // Toggles between Light and Dark mode
+  // Alternar entre modo Claro y Oscuro
   toggleTheme(isDark: boolean): void {
     this.isDarkTheme = isDark;
     if (isDark) {
@@ -213,10 +213,10 @@ export class FeedComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Helper to format avatar image URL
+  // Ayudante para formatear la URL de la imagen del avatar
   getAvatarUrl(avatarPath: string | null): string {
     if (!avatarPath) {
-      return 'assets/default-avatar.png'; // Fallback
+      return 'assets/default-avatar.png'; // Respaldo
     }
     if (avatarPath.startsWith('http')) {
       return avatarPath;
@@ -230,7 +230,7 @@ export class FeedComponent implements OnInit, OnDestroy {
     this.router.navigate(['/login']);
   }
 
-  // Like/Unlike action
+  // Acción de Dar/Quitar "me gusta"
   onToggleLike(commentId: string): void {
     this.feedService.likeComment(commentId).subscribe({
       next: (res) => {
