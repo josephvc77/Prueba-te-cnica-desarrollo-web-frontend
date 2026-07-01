@@ -19,10 +19,10 @@ Asegúrate de tener instalados los siguientes componentes:
 Para descargar e instalar todas las dependencias del cliente en el directorio local `node_modules/`, ejecuta:
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
 
-Este comando descargará Angular 19, RxJS, Socket.io-client y todas las librerías necesarias de desarrollo.
+*(Nota: Se utiliza la bandera `--legacy-peer-deps` para evitar que el instalador de npm falle debido a advertencias estrictas de dependencias cruzadas entre Angular 19 y `zone.js` en entornos locales).*
 
 ---
 
