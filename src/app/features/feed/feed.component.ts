@@ -225,9 +225,18 @@ export class FeedComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    this.authService.logout();
-    this.feedService.disconnectSocket();
-    this.router.navigate(['/login']);
+    this.authService.logout().subscribe({
+      next: () => {
+        this.feedService.disconnectSocket();
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        console.error('Error de red al cerrar sesión en el servidor:', err);
+        // Forzar cierre de sesión local de todos modos
+        this.feedService.disconnectSocket();
+        this.router.navigate(['/login']);
+      }
+    });
   }
 
   // Acción de Dar/Quitar "me gusta"
